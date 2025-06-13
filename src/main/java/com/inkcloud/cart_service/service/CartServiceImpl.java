@@ -29,7 +29,7 @@ public class CartServiceImpl implements CartService {
     private final RestTemplate restTemplate;
 
     // 상품 서비스 엔드포인트 (Gateway 경유 or Eureka 서비스명 사용)
-    private final String productServiceUrl = "http://product-service/api/v1/products";
+    private final String productServiceUrl = "http://api-gateway-service:25000/api/v1/products";
 
     @Override
     public CartResponseDto addToCart(CartRequestDto dto) {
