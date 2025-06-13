@@ -10,7 +10,7 @@ import com.inkcloud.cart_service.domain.Cart;
 
 public interface CartRepository extends JpaRepository<Cart, UUID>, CustomCartRepository{
 
-    Optional<Cart> findByUserIdAndProductId(String userId, String productId);
+    Optional<Cart> findByUserIdAndProductId(String userId, Long productId);
     
     List<Cart> findAllByUserId(String userId);
 

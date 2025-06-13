@@ -14,9 +14,11 @@ public class CartResponseDto {
 
     private String userId;
 
-    private String productId;
+    private Long productId;
 
     private int quantity;
+
+    private String productStatus;
 
     private LocalDateTime createdAt;
 

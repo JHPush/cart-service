@@ -12,8 +12,10 @@ import org.springframework.web.client.RestTemplate;
 import com.inkcloud.cart_service.domain.Cart;
 import com.inkcloud.cart_service.dto.CartRequestDto;
 import com.inkcloud.cart_service.dto.CartResponseDto;
+import com.inkcloud.cart_service.dto.ProductDto;
 import com.inkcloud.cart_service.exception.CartItemNotFoundException;
 import com.inkcloud.cart_service.exception.InvalidCartQuantityException;
+import com.inkcloud.cart_service.exception.InvalidProductStatusException;
 import com.inkcloud.cart_service.exception.ProductNotFoundException;
 import com.inkcloud.cart_service.repository.CartRepository;
 
@@ -34,6 +36,13 @@ public class CartServiceImpl implements CartService {
 
         // 상품 유효성 검증
         validateProductExists(dto.getProductId());
+        
+        // 상품 유효성 및 상태 확인
+        ProductDto product = fetchProduct(dto.getProductId());
+
+        if (!"ON_SALE".equals(product.getStatus())) {
+            throw new InvalidProductStatusException("해당 상품은 현재 장바구니에 담을 수 없습니다. (판매 중 아님)");
+        }
 
         Optional<Cart> existing = cartRepository.findByUserIdAndProductId(dto.getUserId(), dto.getProductId());
 
@@ -55,11 +64,26 @@ public class CartServiceImpl implements CartService {
         return toDto(savedCart);
     }
 
+
     @Override
     public List<CartResponseDto> getCartByUserId(String userId) {
 
-        return cartRepository.findAllByUserId(userId).stream()
-                .map(this::toDto)
+        List<Cart> carts = cartRepository.findAllByUserId(userId);
+
+        return carts.stream()
+                .map(cart -> {
+                    ProductDto product = fetchProduct(cart.getProductId());
+
+                    return CartResponseDto.builder()
+                            .id(cart.getId())
+                            .userId(cart.getUserId())
+                            .productId(cart.getProductId())
+                            .quantity(cart.getQuantity())
+                            .productStatus(product.getStatus())
+                            .createdAt(cart.getCreatedAt())
+                            .updatedAt(cart.getUpdatedAt())
+                            .build();
+                })
                 .collect(Collectors.toList());
     }
 
@@ -94,7 +118,7 @@ public class CartServiceImpl implements CartService {
     }
 
     //상품 유효성 검사
-    private void validateProductExists(String productId) {
+    private void validateProductExists(Long productId) {
 
         String url = productServiceUrl + "/" + productId;
 
@@ -104,6 +128,18 @@ public class CartServiceImpl implements CartService {
             throw new ProductNotFoundException("해당 상품이 존재하지 않습니다. productId=" + productId);
         }
     }
+
+    private ProductDto fetchProduct(Long productId) {
+
+        String url = productServiceUrl + "/" + productId;
+
+        try {
+            return restTemplate.getForObject(url, ProductDto.class);
+        } catch (HttpClientErrorException.NotFound e) {
+            throw new ProductNotFoundException("해당 상품이 존재하지 않습니다. productId=" + productId);
+        }
+    }
+
 
     private CartResponseDto toDto(Cart cart) {
         return CartResponseDto.builder()

@@ -12,6 +12,12 @@ import com.inkcloud.cart_service.dto.ErrorResponse;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(InvalidProductStatusException.class)
+    public ResponseEntity<String> handleInvalidProductStatus(InvalidProductStatusException ex) {
+        
+        return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
     @ExceptionHandler(CartItemNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleNotFound(CartItemNotFoundException ex) {
 

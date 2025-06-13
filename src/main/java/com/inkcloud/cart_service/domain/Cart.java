@@ -29,7 +29,7 @@ public class Cart {
     private String userId;
 
     @Column(name = "product_id", nullable = false, length = 100)
-    private String productId;
+    private Long productId;
 
     @Column(nullable = false)
     private int quantity;
