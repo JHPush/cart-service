@@ -13,10 +13,12 @@ import com.inkcloud.cart_service.dto.CartResponseDto;
 import com.inkcloud.cart_service.service.CartService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @RestController
 @RequestMapping("/api/v1/carts")
 @RequiredArgsConstructor
+@Slf4j
 public class CartController {
 
     private final CartService cartService;
@@ -25,7 +27,11 @@ public class CartController {
     public CartResponseDto addToCart(@RequestBody CartRequestDto requestDto,
                                      @AuthenticationPrincipal Jwt jwt) {
 
+        log.info("requestDto : {}", requestDto);
+        
         String userId = jwt.getSubject();
+        log.info("userId: {}", userId);
+
         requestDto.setUserId(userId);
 
         return cartService.addToCart(requestDto);

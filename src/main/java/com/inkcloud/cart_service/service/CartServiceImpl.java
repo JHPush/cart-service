@@ -20,9 +20,11 @@ import com.inkcloud.cart_service.exception.ProductNotFoundException;
 import com.inkcloud.cart_service.repository.CartRepository;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class CartServiceImpl implements CartService {
 
     private final CartRepository cartRepository;
@@ -34,23 +36,43 @@ public class CartServiceImpl implements CartService {
     @Override
     public CartResponseDto addToCart(CartRequestDto dto) {
 
-        // 상품 유효성 검증
-        validateProductExists(dto.getProductId());
-        
-        // 상품 유효성 및 상태 확인
-        ProductDto product = fetchProduct(dto.getProductId());
+        log.info("[1] 요청 DTO 수신: {}", dto);
 
+        // 1. 상품 존재 여부 확인
+        try {
+            validateProductExists(dto.getProductId());
+            log.info("[2] 상품 존재 확인 완료: productId={}", dto.getProductId());
+        } catch (Exception e) {
+            log.error("[2-ERROR] 상품 존재 확인 실패: {}", e.getMessage(), e);
+            throw e;
+        }
+
+        // 2. 상품 상세 정보 조회
+        ProductDto product = null;
+        try {
+            product = fetchProduct(dto.getProductId());
+            log.info("[3] 상품 정보 조회 완료: {}", product);
+        } catch (Exception e) {
+            log.error("[3-ERROR] 상품 정보 조회 실패: {}", e.getMessage(), e);
+            throw e;
+        }
+
+        // 3. 상태 확인
         if (!"ON_SALE".equals(product.getStatus())) {
+            log.warn("[4-WARN] 상품 상태 비정상: productId={}, status={}", dto.getProductId(), product.getStatus());
             throw new InvalidProductStatusException("해당 상품은 현재 장바구니에 담을 수 없습니다. (판매 중 아님)");
         }
 
+        // 4. 기존 장바구니 여부 확인
         Optional<Cart> existing = cartRepository.findByUserIdAndProductId(dto.getUserId(), dto.getProductId());
-
         Cart savedCart;
+
         if (existing.isPresent()) {
             Cart cart = existing.get();
+            log.info("[5] 기존 장바구니 항목 존재: cartId={}, quantity={}", cart.getId(), cart.getQuantity());
             cart.increaseQuantity();
             savedCart = cartRepository.save(cart);
+            log.info("[6] 장바구니 수량 증가 후 저장 완료: {}", savedCart);
         } else {
             Cart cart = Cart.builder()
                     .id(UUID.randomUUID())
@@ -59,9 +81,12 @@ public class CartServiceImpl implements CartService {
                     .quantity(Math.max(1, dto.getQuantity()))
                     .build();
             savedCart = cartRepository.save(cart);
+            log.info("[5] 새 장바구니 항목 생성 및 저장 완료: {}", savedCart);
         }
 
-        return toDto(savedCart);
+        CartResponseDto responseDto = toDto(savedCart);
+        log.info("[7] 응답 DTO 반환: {}", responseDto);
+        return responseDto;
     }
 
 
@@ -124,6 +149,7 @@ public class CartServiceImpl implements CartService {
 
         try {
             restTemplate.getForEntity(url, Void.class);
+            log.info("Success!!");
         } catch (HttpClientErrorException.NotFound e) {
             throw new ProductNotFoundException("해당 상품이 존재하지 않습니다. productId=" + productId);
         }
