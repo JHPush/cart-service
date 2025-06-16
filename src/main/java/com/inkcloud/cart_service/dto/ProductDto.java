@@ -16,4 +16,12 @@ public class ProductDto {
 
     private String status;
 
+    private String image;
+
+    private int price;
+
+    private String author;
+
+    private String publisher;
+
 }

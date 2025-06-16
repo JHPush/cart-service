@@ -11,17 +11,18 @@ import lombok.Data;
 public class CartResponseDto {
 
     private UUID id;
-
     private String userId;
-
     private Long productId;
-
     private int quantity;
 
     private String productStatus;
+    private String productName;
+    private String productImage;
+    private int productPrice;
+    private String productAuthor;
+    private String productPublisher;
 
     private LocalDateTime createdAt;
-
     private LocalDateTime updatedAt;
     
 }

@@ -105,6 +105,11 @@ public class CartServiceImpl implements CartService {
                             .productId(cart.getProductId())
                             .quantity(cart.getQuantity())
                             .productStatus(product.getStatus())
+                            .productName(product.getName())
+                            .productImage(product.getImage())
+                            .productPrice(product.getPrice())
+                            .productAuthor(product.getAuthor())
+                            .productPublisher(product.getPublisher())
                             .createdAt(cart.getCreatedAt())
                             .updatedAt(cart.getUpdatedAt())
                             .build();
