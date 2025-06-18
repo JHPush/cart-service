@@ -90,3 +90,7 @@ management:
     health:
       probes:
         enabled: true # /actuator/health/readiness, /actuator/health/liveness
+
+product:
+  service:
+    url: ${SPRING_API_GATEWAY_PRODUCT_CORS}

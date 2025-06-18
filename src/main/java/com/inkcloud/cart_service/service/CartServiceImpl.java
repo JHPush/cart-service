@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -31,7 +32,8 @@ public class CartServiceImpl implements CartService {
     private final RestTemplate restTemplate;
 
     // 상품 서비스 엔드포인트 (Gateway 경유 or Eureka 서비스명 사용)
-    private final String productServiceUrl = "http://api-gateway-service:25000/api/v1/products";
+    @Value("${product.service.url}")
+    private final String productServiceUrl;
 
     @Override
     public CartResponseDto addToCart(CartRequestDto dto) {
