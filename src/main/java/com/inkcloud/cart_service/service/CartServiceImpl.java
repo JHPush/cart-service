@@ -33,7 +33,7 @@ public class CartServiceImpl implements CartService {
 
     // 상품 서비스 엔드포인트 (Gateway 경유 or Eureka 서비스명 사용)
     @Value("${product.service.url}")
-    private final String productServiceUrl;
+    private String productServiceUrl;
 
     @Override
     public CartResponseDto addToCart(CartRequestDto dto) {
