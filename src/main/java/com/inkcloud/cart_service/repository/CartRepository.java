@@ -1,5 +1,6 @@
 package com.inkcloud.cart_service.repository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -13,5 +14,6 @@ public interface CartRepository extends JpaRepository<Cart, UUID>, CustomCartRep
     Optional<Cart> findByUserIdAndProductId(String userId, Long productId);
     
     List<Cart> findAllByUserId(String userId);
-
+    
+    int deleteByCreatedAtBefore(LocalDateTime deadline);
 }
