@@ -8,7 +8,7 @@ import com.inkcloud.cart_service.service.CartCleanupService;
 
 import lombok.RequiredArgsConstructor;
 
-@Profile("!cleanup")
+@Profile("cleanup")
 @Component
 @RequiredArgsConstructor
 public class CartCleanupCommand implements CommandLineRunner {
