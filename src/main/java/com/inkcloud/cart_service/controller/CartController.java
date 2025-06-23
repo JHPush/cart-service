@@ -3,6 +3,7 @@ package com.inkcloud.cart_service.controller;
 import java.util.List;
 import java.util.UUID;
 
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -15,6 +16,7 @@ import com.inkcloud.cart_service.service.CartService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+@Profile("!cleanup")
 @RestController
 @RequestMapping("/api/v1/carts")
 @RequiredArgsConstructor
